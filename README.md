@@ -1,154 +1,119 @@
 # InkArcana 🎴
-### A Contemplative 1909 Rider–Waite–Smith Tarot Companion for XTEINK X4 Pro (XTOS Licorice)
+### A reflective 1909 Rider-Waite-Smith tarot companion for XTEINK X4 Pro
 
 > [!IMPORTANT]
-> **Disclaimer & Community Attribution:**  
-> **InkArcana** is an independent, open-source community tribute inspired by the contemplative e-paper interface and design philosophy of [Pocket Oracle](https://pocketoracle.org/) (by Hiroic Ventures).  
-> It is **in no way officially affiliated with, endorsed by, maintained by, or connected to Pocket Oracle, Hiroic Ventures, or its creators**.
-> 
-> All 78 tarot illustrations are from the original 1909 deck drawn by **Pamela Colman Smith** under the direction of Arthur Edward Waite and are in the **public domain**.
+> **InkArcana** is an independent open-source project inspired by the contemplative e-paper approach of [Pocket Oracle](https://pocketoracle.org/) by Hiroic Ventures. It is not affiliated with Pocket Oracle or Hiroic Ventures.
+>
+> The 78 illustrations come from the original 1909 Rider-Waite-Smith deck drawn by **Pamela Colman Smith** under the direction of Arthur Edward Waite. The artwork is in the public domain.
+
+InkArcana treats tarot cards as prompts for reflection rather than predictions.
 
 ---
 
-## ⚡ Quick Start: Ready-to-Install App
+## Quick start
 
-You do not need to build from source unless you want to customize the code! A pre-packaged, signed binary is included directly in this repository:
+A rebuilt `inkarcana.xtapp` is included in the repository.
 
-1. **Download:** Grab [`inkarcana.xtapp`](./inkarcana.xtapp) from the root of this repository or from the [**GitHub Releases**](https://github.com/miquelangelfuentes/ink-arcana/releases/latest).
-2. **Transfer to SD Card:** Copy `inkarcana.xtapp` directly to the **root directory** of your FAT32 microSD card (not inside any folder).
-3. **Install on Device:**
-   - Insert the microSD card into your **XTEINK X4 Pro**.
-   - Open **All Files** from the main launcher menu.
-   - Tap `inkarcana.xtapp` and select **Install this package**.
-4. **Launch:** Access **InkArcana** from the **Mini Apps / Ink App** drawer (if locked, tap **"Model" 10 times** in **Settings → About**).
+1. Download [`inkarcana.xtapp`](./inkarcana.xtapp).
+2. Copy it to the root of a FAT32 microSD card.
+3. On the XTEINK X4 Pro, open **All Files**, select the package and choose **Install this package**.
+4. Open **Ink App** and launch **InkArcana**. If the Ink App entry is hidden, open **Settings → About** and tap **Model** ten times.
 
-> [!TIP]
-> **Alternative Direct Folder Install (Bypass On-Device Installer):**  
-> You can also bypass the on-device "Install" dialog entirely by copying the file directly on your computer:  
-> Create the folder `/XTApps/inkarcana/` on your SD card and place `inkarcana.xtapp` inside it renamed as `app.xtapp` (path: `/XTApps/inkarcana/app.xtapp`).  
-> Insert the SD card, and the app will appear immediately in the **Mini Apps** drawer!
+The package targets XTOS Licorice with manifest API `2.0`, which is exposed as API 2.9 on the tested current firmware.
 
 ---
 
-## 🌟 Key Features
+## What the app does
 
-### 1. Daily Oracle Ritual (Inspired by Pocket Oracle)
-- **The Card Waits:** Starts face-down every morning featuring an authentic geometric talisman card back (`+` star matrix and central 8-spoke sacred wheel).
-- **One Keyword Upfront:** Tap or press OK to turn the card and reveal its Atkinson-dithered 1909 artwork and its single, punchy keyword (e.g. `Nine of Cups` $\rightarrow$ `Contentment`).
-- **The Full Contemplation:** Turn the card again to read its full poetic reflection, cleanly formatted and centered for distraction-free reading on the e-ink screen.
-- **Press to Return:** Completes the contemplative cycle, returning smoothly to the waiting state.
+### Daily card
 
-### 2. Carefully Dithered for E-Paper (Pamela Colman Smith 1909)
-- All 78 cards have been scanned and processed using custom **Atkinson dithering** (preserving 75% diffusion error while leaving clear, luminous white spaces).
-- Unlike standard Floyd-Steinberg dithering which produces a hazy gray speckle on e-ink, Atkinson dithering produces high-contrast, razor-sharp line work and rich black inks tuned specifically for the X4 Pro's portrait screen.
-- Cards are packed into fixed-stride base64 streams (`data/art_l1.txt` & `data/art_l2.txt`) allowing instantaneous $O(1)$ on-demand decoding without eating device RAM.
+The card begins face-down. Turn it to see the illustration and its short reflective theme. Tap the card again to read the full reflection. The same daily card is kept for the local calendar day.
 
-### 3. Tarot Learning & Flashcard Quiz Mode 🎓
-- **Visual Intuition Practice:** Displays the 1909 artwork with all titles and keywords concealed (`? ? ? MYSTERY CARD ? ? ?`).
-- **Tap to Reveal:** Test your intuitive visual recall of Pamela Colman Smith's classical symbols and archetypes before revealing the card's identity.
-- **Archetype Breakdown:** Reveals Card Title, Upright Keyword, Shadow Keyword, and an archetypal synthesis.
-- **Study Navigation:** Step sequentially through the entire 78-card deck using `< PREV` / `NEXT >` (or the physical side buttons), or tap `RANDOM CARD` for quick flashcard sessions.
+### Reflective spreads
 
-### 4. Standby / Desk Altar Mode 🖼️
-- **Zero-Power Sacred Space:** Leverages the zero-power bistable nature of E-Ink screens. Place your X4 Pro on your desk, workstation, or nightstand with your daily card permanently visible without draining the battery.
-- Strips away all interactive UI chrome, buttons, and navigation for a pure, serene art print aesthetic.
-- Displays the card artwork, card title, upright keyword, and sacred emblem. Tap anywhere on the screen to return to the active app.
+InkArcana includes a three-card reflection with the positions **What shaped this**, **Where you are** and **What may emerge**. A shorter two-card reflection uses **Where you stand** and **What meets you**.
 
-### 5. Multi-Card Contemplation Spreads 🃏
-- **The Triad (3-Card Spread):**
-  - Card 1: *The Root* (Past foundations / origins)
-  - Card 2: *The Axis* (Present moment / current focus)
-  - Card 3: *The Horizon* (Emerging trajectory / future lessons)
-- **The Threshold Cross (2-Card Spread):**
-  - Card 1: *The Ground* (Where you currently stand)
-  - Card 2: *The Crossing* (The immediate obstacle, tension, or ally)
-- **Spread Carousel:** Step between cards using the on-screen arrows (`< Card 1 of 3 >`) or physical side buttons; tap any card to view its specific contextual position and contemplation.
+Cards in a spread are selected without duplicates. Reversed cards can be enabled from the menu.
 
-### 6. Shadow Work & Upside-Down Reversals 🔄
-- Toggle Reversals **ON / OFF** anytime via the menu.
-- When drawn reversed (~25% organic probability):
-  - Card artwork is rotated **180° upside-down** on the e-ink screen.
-  - Displays the card's **Shadow Keyword** (e.g. `Smugness` instead of `Contentment`).
-  - Displays the **Shadow Work Reflection** on the back, inviting reflection on what is hidden, repressed, overextended, or blocked.
+### Study mode
+
+Study mode shows one card at a time. You can hide its identity before revealing it, move through the deck with the screen controls or use the physical side buttons. A random-card control is also available.
+
+### Desk altar
+
+Desk Altar keeps the daily card on a minimal screen with its date and reflective theme. Because e-paper is bistable, the displayed image itself does not require continuous screen power. Tap anywhere to return to the app.
 
 ---
 
-## 🧭 In-App Controls & Navigation
+## Artwork on the X4 Pro
 
-- **Tap `[ ≡ ]` (Top-Left):** Opens the master menu overlay to switch between:
-  1. *Daily Oracle Ritual*
-  2. *Three-Card Triad Spread*
-  3. *Two-Card Cross Spread*
-  4. *Tarot Study & Flashcards*
-  5. *Desk Altar (Standby Mode)*
-  6. *Shadow Reversals: [ ON / OFF ]*
-- **Physical Side Buttons:**
-  - In Daily/Study mode: Browse sequentially through the 78 cards.
-  - In Spreads mode: Step between Card 1, Card 2, and Card 3.
-- **Screen Tap or OK Button:**
-  - Flips card front and back or confirms options.
+The Pamela Colman Smith images are prepared as 1-bit Atkinson-dithered PNGs for the 480 × 800 e-paper display. Their base64 data is divided between `data/art_l1.txt` and `data/art_l2.txt`.
+
+Images are decoded only when needed. The app keeps a small runtime cache and explicitly releases older decoded images so it stays within the host's limited image resources.
+
+If an image cannot be decoded, InkArcana keeps running and shows a framed card name instead.
 
 ---
 
-## 📦 Repository Structure
+## XTOS Licorice compatibility
 
-```
+Version 1.1 follows the API 2.9 behavior observed on current Licorice builds. In particular, it uses the canvas passed to `on_draw(ctx, g)`, handles completed pointer taps on `phase="up"` and calls context methods with method syntax such as `ctx:invalidate()`.
+
+The app also avoids the unavailable standard `os` library. Time comes from `ctx.clock`, while random selections use the host random source where available.
+
+Side-button events are debounced because the firmware can emit more than one event for a physical press. Decoded images use a bounded cache with explicit release.
+
+---
+
+## Repository structure
+
+```text
 ink-arcana/
-├── inkarcana.xtapp     # Pre-compiled, install-ready package for XTEINK X4 Pro
-├── manifest.json       # XTOS Licorice API 2.0 app metadata
-├── index.lua           # Complete Lua engine (Ritual, Spreads, Quiz, Altar, Menus)
-├── icon.png            # 96x96 1bpp rounded squircle icon for Licorice launcher
-├── icon_cards_alt.png  # Alternate 96x96 fan-style icon
-├── xtpack.py           # Packaging compiler for XTOS Licorice
-├── requirements.txt    # Python dependencies for packager (cryptography, Pillow)
-├── tools/vendor/       # Cryptographic packaging tools (P-256 ECDH + AES-KW)
+├── inkarcana.xtapp
+├── manifest.json
+├── index.lua
+├── icon.png
+├── test_suite.py
+├── verify_container.py
+├── xtpack.py
+├── APP_CONSTRUCTION_AND_TESTS.md
 └── data/
-    ├── cards.txt       # All 78 cards (Title | Upright KW | Upright Read | Shadow KW | Shadow Read)
-    ├── art_l1.txt      # Cards 1 to 39: 1-bit Atkinson-dithered PNGs (240x418)
-    └── art_l2.txt      # Cards 40 to 78: 1-bit Atkinson-dithered PNGs (240x418)
+    ├── cards.txt
+    ├── art_l1.txt
+    └── art_l2.txt
 ```
 
----
-
-## 🛠️ Building from Source
-
-If you want to modify the Lua scripts or add new card data:
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/miquelangelfuentes/ink-arcana.git
-   cd ink-arcana
-   ```
-
-2. **Set up a Python virtual environment:**
-   ```bash
-   py -m venv .venv
-   .venv\Scripts\pip install -r requirements.txt
-   ```
-
-3. **Run the Test Suite:**
-   ```bash
-   .venv\Scripts\python.exe test_suite.py
-   .venv\Scripts\python.exe verify_container.py
-   ```
-
-4. **Pack the `.xtapp`:**
-   ```bash
-   .venv\Scripts\python.exe xtpack.py . -o inkarcana.xtapp
-   ```
+`data/cards.txt` is the source for all card wording. Each upright or reversed keyword field uses one idea or a linked pair rather than a three-item list.
 
 ---
 
-## 🔬 Architecture, Firmware Verification & Test Report
+## Build and verify
 
-For an in-depth technical analysis of the XTOS Licorice firmware reverse engineering, root-cause analyses of previous crash logs, memory limits, and the complete 12-stage test matrix, see:
-👉 [**App Construction & Verification Report (APP_CONSTRUCTION_AND_TESTS.md)**](./APP_CONSTRUCTION_AND_TESTS.md)
+Create a virtual environment and install the dependencies:
+
+```bash
+py -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+```
+
+Run the API regression suite and package verifier:
+
+```bash
+.venv\Scripts\python.exe test_suite.py
+.venv\Scripts\python.exe verify_container.py
+```
+
+`verify_container.py` rebuilds `inkarcana.xtapp`, checks the Licorice package-size ceiling and validates the package sections.
+
+GitHub Actions runs the same checks whenever app source or package data changes. If the package differs, the workflow commits the rebuilt `.xtapp` back to the repository.
+
+For implementation details and the limits of automated testing, see [APP_CONSTRUCTION_AND_TESTS.md](./APP_CONSTRUCTION_AND_TESTS.md).
 
 ---
 
-## 📜 Credits & License
+## Credits and licence
 
-- **Inspiration:** Inspired by [Pocket Oracle](https://pocketoracle.org/) by Hiroic Ventures.
-- **Tarot Art:** Original 1909 line illustrations by **Pamela Colman Smith**, under the direction of **Arthur Edward Waite** (Public Domain).
-- **Firmware & Packaging Architecture:** Based on reverse engineering and container research by `kycube/x4pro-emu` and the open-source XTEINK community.
-- **License:** MIT License. Free and open source for the e-ink and tarot communities.
+- **Inspiration:** [Pocket Oracle](https://pocketoracle.org/) by Hiroic Ventures.
+- **Artwork:** Pamela Colman Smith's 1909 Rider-Waite-Smith illustrations, public domain.
+- **Firmware research:** XTEINK community reverse engineering, including `kycube/x4pro-emu` and `omer-faruq-xteink/touch-licorice-apps`.
+- **Licence:** MIT.
