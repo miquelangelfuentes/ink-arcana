@@ -42,6 +42,31 @@ jobs:
       - name: Rebuild and verify package
         run: python verify_container.py
 
+      - name: Publish v1.1.0 release
+        if: github.event_name == 'push' && github.actor != 'github-actions[bot]'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > release-notes.md <<'EOF'
+          ## InkArcana v1.1.0
+
+          This release updates InkArcana for the observed XTOS Licorice API 2.9 host and includes the rebuilt `inkarcana.xtapp`.
+
+          - Corrects drawing, touch input and context-method handling for API 2.9.
+          - Improves image-resource management, persistence and physical-button handling.
+          - Revises all 78 card texts for a more consistent reflective style and removes obvious three-part lists.
+          - Keeps the daily card fixed for the day while allowing its views to be explored with touch or side buttons.
+          - Adds stronger regression tests and package verification.
+
+          Automated checks pass. Physical-device testing on the XTEINK X4 Pro is still recommended before treating a build as fully validated on hardware.
+          EOF
+          if gh release view v1.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.1.0 inkarcana.xtapp --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit v1.1.0 --repo "$GITHUB_REPOSITORY" --title "InkArcana v1.1.0" --notes-file release-notes.md
+          else
+            gh release create v1.1.0 inkarcana.xtapp --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "InkArcana v1.1.0" --notes-file release-notes.md
+          fi
+
       - name: Commit rebuilt package
         if: github.event_name == 'push' && github.actor != 'github-actions[bot]'
         run: |
