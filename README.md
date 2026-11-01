@@ -37,7 +37,15 @@ Cards in a spread are selected without duplicates. Reversed cards can be enabled
 
 ### Study mode
 
-Study mode shows each card with its name and the currently selected orientation. Use the upright/reversed toggle to rotate the card and switch its keywords. Tap the card to open the full interpretation for that orientation; this gives the meaning enough space to display without being cut short. The deck navigation controls remain available below.
+Study mode now works as a deck-learning workspace. Each card is identified immediately and includes suit or arcana metadata. You can filter the deck by suit, favourites or learned cards; random selection respects the active filter. Cards can be marked as learned or favourite, and the FLIP control makes upright and reversed meanings available independently of the reading setting. Longer meanings are paginated rather than silently cut off.
+
+### Recent readings
+
+InkArcana keeps a lightweight history of the six most recent spreads. The history stores card indexes and orientations rather than artwork, and a saved spread can be reopened from the menu. Each new spread also includes an overview with a direct option to generate another spread of the same type.
+
+### Help and controls
+
+A two-page Help screen explains the app modes and the physical controls. Long readings use the side buttons for page changes while the reading is open.
 
 ### Desk altar
 
@@ -57,7 +65,7 @@ If an image cannot be decoded, InkArcana keeps running and shows a framed card n
 
 ## XTOS Licorice compatibility
 
-Version 1.1 follows the API 2.9 behavior observed on current Licorice builds. In particular, it uses the canvas passed to `on_draw(ctx, g)`, handles completed pointer taps on `phase="up"` and calls context methods with method syntax such as `ctx:invalidate()`.
+Version 1.5 follows the API 2.9 behavior observed on current Licorice builds. In particular, it uses the canvas passed to `on_draw(ctx, g)`, handles completed pointer taps on `phase="up"` and calls context methods with method syntax such as `ctx:invalidate()`.
 
 The app also avoids the unavailable standard `os` library. Time comes from `ctx.clock`, while random selections use the host random source where available.
 

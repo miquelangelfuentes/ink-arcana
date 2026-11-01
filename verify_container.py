@@ -27,7 +27,7 @@ head, manifest = xtapp.read_licorice_container(raw)
 
 assert manifest["app_id"] == "inkarcana"
 assert manifest["display_name"] == "InkArcana"
-assert manifest["version"] == "1.4.0"
+assert manifest["version"] == "1.5.0"
 assert manifest["entry"] == "index.lua"
 assert manifest["api"] == "2.0"
 assert manifest.get("permissions", []) == []
