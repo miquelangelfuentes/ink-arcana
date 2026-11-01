@@ -3,8 +3,17 @@ name: Build and verify InkArcana
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - inkarcana.xtapp
+    paths:
+      - index.lua
+      - manifest.json
+      - data/**
+      - icon.png
+      - xtpack.py
+      - verify_container.py
+      - test_suite.py
+      - requirements.txt
+      - tools/**
+      - .github/workflows/build-and-verify.yml
   workflow_dispatch:
 
 permissions:
@@ -26,7 +35,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install lupa
 
       - name: Run API 2.9 regression tests
         run: python test_suite.py
