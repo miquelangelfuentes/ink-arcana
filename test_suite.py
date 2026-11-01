@@ -1,5 +1,4 @@
 import re
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -133,11 +132,20 @@ assert(draw_calls > 5, "on_draw returned without using the API 2.x canvas")
 local S = __TEST.api.state()
 assert(S.daily_view == "waits")
 
+-- A side button may reveal the daily card, but it must never replace today's card.
+local daily_index = S.daily_index
+on_input(ctx, { type = "key", key = "right", phase = "down", time_ms = 500 })
+assert(S.daily_index == daily_index, "side button changed the fixed daily card")
+assert(S.daily_view == "front", "side button should reveal the daily card")
+S.daily_view = "waits"
+S.has_turned_today = false
+
+-- Pointer down is not a completed tap; pointer up is.
 on_input(ctx, { type = "pointer", phase = "down", gesture = "tap", x = 240, y = 300, time_ms = 1000 })
 assert(S.daily_view == "waits")
-
 on_input(ctx, { type = "pointer", phase = "up", gesture = "tap", x = 240, y = 300, time_ms = 1100 })
 assert(S.daily_view == "front")
+assert(S.daily_index == daily_index, "touch changed the fixed daily card")
 
 on_input(ctx, { type = "pointer", phase = "up", gesture = "tap", x = 40, y = 30, time_ms = 1400 })
 assert(S.menu_open == true)
