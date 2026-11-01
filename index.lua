@@ -299,9 +299,16 @@ end
 
 local function title_bar(gg, title)
     button(gg, HEADER_MENU_X, HEADER_MENU_Y, HEADER_MENU_W, HEADER_MENU_H, "MENU", "small")
+    local left = HEADER_MENU_X + HEADER_MENU_W + 12
+    local right = W - 14
     local title_font = "medium"
-    if text_width(font(title_font), title) > W - 130 then title_font = "small" end
-    centered(gg, 22, title, title_font)
+    local tw = text_width(font(title_font), title)
+    if tw > right - left then
+        title_font = "small"
+        tw = text_width(font(title_font), title)
+    end
+    local tx = left + math.max(0, math.floor(((right - left) - tw) / 2))
+    gg:text(tx, 22, title, { font = font(title_font) })
     gg:line(14, HEADER_RULE_Y, W - 14, HEADER_RULE_Y, { width = 1 })
 end
 

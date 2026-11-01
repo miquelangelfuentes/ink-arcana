@@ -1,7 +1,7 @@
 {
   "app_id": "inkarcana",
   "display_name": "InkArcana",
-  "version": "1.2",
+  "version": "1.2.1",
   "author": "Community",
   "description": "A reflective e-paper tarot companion for the 1909 Rider-Waite-Smith deck.",
   "entry": "index.lua",
