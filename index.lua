@@ -574,9 +574,15 @@ local function handle_key(ev)
         state.study_index = ((state.study_index - 1 + d) % #cards) + 1
         state.study_revealed = false
     elseif state.mode == "daily" and #cards > 0 then
-        state.daily_index = ((state.daily_index - 1 + d) % #cards) + 1
-        state.daily_view = "front"
-        state.has_turned_today = true
+        if state.daily_view == "waits" then
+            state.daily_view = "front"
+            state.has_turned_today = true
+        elseif state.daily_view == "front" then
+            state.daily_view = "reading"
+        else
+            state.daily_view = "front"
+        end
+        save_state()
     end
     refresh()
 end
