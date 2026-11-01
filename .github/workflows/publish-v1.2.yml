@@ -1,0 +1,30 @@
+name: Publish InkArcana v1.2.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-v1.2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.2.0 >/dev/null 2>&1; then
+            echo "v1.2.0 already exists"
+          else
+            gh release create v1.2.0 inkarcana.xtapp \
+              --target main \
+              --title "InkArcana v1.2.0" \
+              --notes "A visual refinement release for XTEINK X4 Pro. The MENU control has more room and no longer crowds its frame. Reversed cards now show a clear REVERSED status outside the artwork instead of an overlay badge. The menu and card screens use cleaner spacing and lighter e-paper-friendly navigation. Spread and Study views also show position context. The working Licorice API 2.9 behavior from v1.1.0 is preserved."
+          fi
