@@ -22,6 +22,12 @@ You do not need to build from source unless you want to customize the code! A pr
    - Tap `inkarcana.xtapp` and select **Install this package**.
 4. **Launch:** Access **InkArcana** from the **Mini Apps / Ink App** drawer (if locked, tap **"Model" 10 times** in **Settings → About**).
 
+> [!TIP]
+> **Alternative Direct Folder Install (Bypass On-Device Installer):**  
+> You can also bypass the on-device "Install" dialog entirely by copying the file directly on your computer:  
+> Create the folder `/XTApps/inkarcana/` on your SD card and place `inkarcana.xtapp` inside it renamed as `app.xtapp` (path: `/XTApps/inkarcana/app.xtapp`).  
+> Insert the SD card, and the app will appear immediately in the **Mini Apps** drawer!
+
 ---
 
 ## 🌟 Key Features
