@@ -126,10 +126,23 @@ If you want to modify the Lua scripts or add new card data:
    .venv\Scripts\pip install -r requirements.txt
    ```
 
-3. **Pack the `.xtapp`:**
+3. **Run the Test Suite:**
+   ```bash
+   .venv\Scripts\python.exe test_suite.py
+   .venv\Scripts\python.exe verify_container.py
+   ```
+
+4. **Pack the `.xtapp`:**
    ```bash
    .venv\Scripts\python.exe xtpack.py . -o inkarcana.xtapp
    ```
+
+---
+
+## 🔬 Architecture, Firmware Verification & Test Report
+
+For an in-depth technical analysis of the XTOS Licorice firmware reverse engineering, root-cause analyses of previous crash logs, memory limits, and the complete 12-stage test matrix, see:
+👉 [**App Construction & Verification Report (APP_CONSTRUCTION_AND_TESTS.md)**](./APP_CONSTRUCTION_AND_TESTS.md)
 
 ---
 
