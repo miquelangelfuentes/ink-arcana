@@ -301,14 +301,29 @@ local function title_bar(gg, title)
     button(gg, HEADER_MENU_X, HEADER_MENU_Y, HEADER_MENU_W, HEADER_MENU_H, "MENU", "small")
     local left = HEADER_MENU_X + HEADER_MENU_W + 12
     local right = W - 14
-    local title_font = "medium"
-    local tw = text_width(font(title_font), title)
-    if tw > right - left then
-        title_font = "small"
-        tw = text_width(font(title_font), title)
+    local available = right - left
+
+    local function region_text(y, text, fname)
+        local f = font(fname)
+        local tw = text_width(f, text)
+        local tx = left + math.max(0, math.floor((available - tw) / 2))
+        gg:text(tx, y, text, { font = f })
     end
-    local tx = left + math.max(0, math.floor(((right - left) - tw) / 2))
-    gg:text(tx, 22, title, { font = font(title_font) })
+
+    -- Spread headings are deliberately split instead of relying on font metrics.
+    -- This keeps them clear of MENU on the physical X4 Pro display.
+    if title:find("CARD REFLECTION", 1, true) then
+        local first = title:gsub(" REFLECTION$", "")
+        region_text(11, first, "small")
+        region_text(35, "REFLECTION", "small")
+    else
+        local title_font = "medium"
+        if text_width(font(title_font), title) > available then
+            title_font = "small"
+        end
+        region_text(22, title, title_font)
+    end
+
     gg:line(14, HEADER_RULE_Y, W - 14, HEADER_RULE_Y, { width = 1 })
 end
 

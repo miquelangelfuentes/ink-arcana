@@ -16,6 +16,7 @@ assert 'ev.type == "pointer"' in SOURCE and 'ev.phase == "up"' in SOURCE, "point
 assert "ctx:invalidate()" in SOURCE, "API 2.x ctx methods must use colon syntax"
 assert "ctx:save_state()" in SOURCE, "state persistence must use save_state"
 assert ":release()" in SOURCE, "decoded images need an explicit release path"
+assert 'title:find("CARD REFLECTION", 1, true)' in SOURCE, "spread headers must use the overlap-safe two-line layout"
 
 assert len(CARDS) == 78, f"expected 78 cards, got {len(CARDS)}"
 keys = set()
