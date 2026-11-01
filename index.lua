@@ -1,10 +1,14 @@
 -- InkArcana for XTEINK X4 Pro / XTOS Licorice API 2.x
+-- Visual polish v1.2: refined spacing and e-paper-friendly controls.
 -- Designed for the API 2.9 host observed on firmware 26102301 / 26102401.
 -- The app is fully offline. Tarot is presented as a reflective prompt, not a prediction.
 
 local W, H = 480, 800
 local CARD_W, CARD_H = 240, 418
-local CARD_X, CARD_Y = 120, 72
+local CARD_X, CARD_Y = 120, 84
+local HEADER_MENU_X, HEADER_MENU_Y = 14, 16
+local HEADER_MENU_W, HEADER_MENU_H = 78, 36
+local HEADER_RULE_Y = 64
 local PER_FILE = 39
 local MAX_IMAGES = 4
 local KEY_GAP_MS = 250
@@ -247,22 +251,32 @@ end
 
 local function button(gg, x, y, w, h, label, fname)
     gg:rect(x, y, w, h, { line_width = 1 })
-    local f = font(fname or "small")
-    local tx = x + math.floor((w - text_width(f, label)) / 2)
-    local ty = y + math.floor((h - line_height(fname or "small")) / 2)
+    local chosen = fname or "small"
+    local f = font(chosen)
+    local tw = text_width(f, label)
+    if tw > w - 12 and chosen ~= "small" then
+        chosen = "small"
+        f = font(chosen)
+        tw = text_width(f, label)
+    end
+    local tx = x + math.floor((w - tw) / 2)
+    if tx < x + 4 then tx = x + 4 end
+    local ty = y + math.max(1, math.floor((h - line_height(chosen)) / 2))
     gg:text(tx, ty, label, { font = f })
 end
 
 local function draw_card_back(gg, x, y, w, h)
     gg:rect(x, y, w, h, { line_width = 2 })
-    gg:rect(x + 7, y + 7, w - 14, h - 14, { line_width = 1 })
+    gg:rect(x + 8, y + 8, w - 16, h - 16, { line_width = 1 })
+    gg:rect(x + 14, y + 14, w - 28, h - 28, { line_width = 1 })
     local cx, cy = x + math.floor(w / 2), y + math.floor(h / 2)
-    gg:circle(cx, cy, 44, { line_width = 2 })
-    gg:circle(cx, cy, 14, { line_width = 1 })
-    for k = 0, 7 do
-        local a = k * math.pi / 4
-        gg:line(cx, cy, cx + math.floor(42 * math.cos(a)), cy + math.floor(42 * math.sin(a)), { width = 1 })
-    end
+    local r = 42
+    gg:line(cx, cy - r, cx + r, cy, { width = 1 })
+    gg:line(cx + r, cy, cx, cy + r, { width = 1 })
+    gg:line(cx, cy + r, cx - r, cy, { width = 1 })
+    gg:line(cx - r, cy, cx, cy - r, { width = 1 })
+    gg:circle(cx, cy, 27, { line_width = 1 })
+    gg:circle(cx, cy, 6, { line_width = 1 })
 end
 
 local function draw_card_art(gg, idx, reversed, x, y, w, h)
@@ -281,25 +295,32 @@ local function draw_card_art(gg, idx, reversed, x, y, w, h)
     else
         gg:rect(x, y, w, h, { line_width = 1 })
     end
-    if reversed then
-        button(gg, x + w - 62, y + 8, 54, 28, "REV", "small")
-    end
 end
 
 local function title_bar(gg, title)
-    button(gg, 14, 14, 56, 40, "MENU", "small")
-    centered(gg, 24, title, "medium")
-    gg:line(14, 64, W - 14, 64)
+    button(gg, HEADER_MENU_X, HEADER_MENU_Y, HEADER_MENU_W, HEADER_MENU_H, "MENU", "small")
+    local title_font = "medium"
+    if text_width(font(title_font), title) > W - 130 then title_font = "small" end
+    centered(gg, 22, title, title_font)
+    gg:line(14, HEADER_RULE_Y, W - 14, HEADER_RULE_Y, { width = 1 })
 end
 
 local function draw_reading(gg, c, reversed, title)
-    centered(gg, 96, title, "large")
+    centered(gg, 92, title, "small")
+    local card_font = text_width(font("large"), c.name) > 420 and "medium" or "large"
+    centered(gg, 126, c.name, card_font)
+    local kw_y = 188
+    if reversed then
+        centered(gg, 168, "REVERSED", "small")
+        kw_y = 202
+    end
     local kw = reversed and c.rev_kw or c.up_kw
-    centered(gg, 145, kw, "medium")
-    gg:line(110, 180, 370, 180)
+    centered(gg, kw_y, kw, "medium")
+    gg:line(100, 238, 380, 238, { width = 1 })
     local body = reversed and c.rev_read or c.up_read
-    paragraph(gg, 220, body, "medium", 390, 650)
-    centered(gg, 705, "Tap to return to the card", "small")
+    paragraph(gg, 274, body, "medium", 400, 650)
+    gg:line(150, 686, 330, 686, { width = 1 })
+    centered(gg, 708, "Tap to return to the card", "small")
 end
 
 local function draw_daily(gg)
@@ -311,15 +332,21 @@ local function draw_daily(gg)
     local c = cards[state.daily_index]
     if state.daily_view == "waits" then
         draw_card_back(gg, CARD_X, CARD_Y, CARD_W, CARD_H)
-        centered(gg, 535, "THE CARD WAITS", "large")
-        centered(gg, 590, "Tap to turn today's card", "medium")
+        centered(gg, 542, "The card waits", "large")
+        centered(gg, 594, "Tap to turn today's card", "medium")
     elseif state.daily_view == "front" then
         draw_card_art(gg, state.daily_index, state.daily_reversed, CARD_X, CARD_Y, CARD_W, CARD_H)
-        centered(gg, 535, c.name .. (state.daily_reversed and " (reversed)" or ""), "large")
-        centered(gg, 585, state.daily_reversed and c.rev_kw or c.up_kw, "medium")
+        centered(gg, 538, c.name, "large")
+        local kw_y = 590
+        if state.daily_reversed then
+            centered(gg, 576, "REVERSED", "small")
+            kw_y = 610
+        end
+        centered(gg, kw_y, state.daily_reversed and c.rev_kw or c.up_kw, "medium")
+        gg:line(145, 650, 335, 650, { width = 1 })
         centered(gg, 700, "Tap the card to reflect", "small")
     else
-        draw_reading(gg, c, state.daily_reversed, c.name .. (state.daily_reversed and " (reversed)" or ""))
+        draw_reading(gg, c, state.daily_reversed, "TODAY'S CARD")
     end
 end
 
@@ -339,11 +366,18 @@ local function draw_spread(gg)
         draw_reading(gg, c, entry.reversed, spread_label(entry))
         return
     end
-    centered(gg, 74, spread_label(entry), "small")
+    local position = string.format("%d / %d   %s", state.spread_pos, #state.spread_cards, spread_label(entry))
+    centered(gg, 76, position, "small")
     draw_card_art(gg, entry.index, entry.reversed, CARD_X, 105, CARD_W, CARD_H)
-    centered(gg, 545, c.name .. (entry.reversed and " (reversed)" or ""), "large")
-    centered(gg, 590, entry.reversed and c.rev_kw or c.up_kw, "medium")
-    button(gg, 24, 718, 118, 48, "PREVIOUS", "small")
+    centered(gg, 548, c.name, "large")
+    local kw_y = 592
+    if entry.reversed then
+        centered(gg, 580, "REVERSED", "small")
+        kw_y = 612
+    end
+    centered(gg, kw_y, entry.reversed and c.rev_kw or c.up_kw, "medium")
+    gg:line(145, 650, 335, 650, { width = 1 })
+    button(gg, 24, 718, 118, 48, "PREV", "small")
     button(gg, 168, 718, 144, 48, "REFLECT", "small")
     button(gg, 338, 718, 118, 48, "NEXT", "small")
 end
@@ -352,7 +386,8 @@ local function draw_study(gg)
     title_bar(gg, "STUDY")
     if #cards == 0 then return end
     local c = cards[state.study_index]
-    draw_card_art(gg, state.study_index, false, CARD_X, 92, CARD_W, CARD_H)
+    centered(gg, 72, string.format("%d / %d", state.study_index, #cards), "small")
+    draw_card_art(gg, state.study_index, false, CARD_X, 96, CARD_W, CARD_H)
     if state.study_revealed then
         centered(gg, 530, c.name, "large")
         centered(gg, 575, c.up_kw, "medium")
@@ -361,7 +396,7 @@ local function draw_study(gg)
         centered(gg, 535, "MYSTERY CARD", "large")
         centered(gg, 585, "Tap the card to reveal it", "medium")
     end
-    button(gg, 24, 718, 118, 48, "PREVIOUS", "small")
+    button(gg, 24, 718, 118, 48, "PREV", "small")
     button(gg, 168, 718, 144, 48, "RANDOM", "small")
     button(gg, 338, 718, 118, 48, "NEXT", "small")
 end
@@ -369,11 +404,18 @@ end
 local function draw_altar(gg)
     if #cards == 0 then return end
     local c = cards[state.daily_index]
-    centered(gg, 24, "INKARCANA", "medium")
-    centered(gg, 54, formatted_date(), "small")
+    centered(gg, 22, "INKARCANA", "medium")
+    centered(gg, 52, formatted_date(), "small")
+    gg:line(155, 79, 325, 79, { width = 1 })
     draw_card_art(gg, state.daily_index, state.daily_reversed, CARD_X, 100, CARD_W, CARD_H)
-    centered(gg, 555, c.name .. (state.daily_reversed and " (reversed)" or ""), "large")
-    centered(gg, 605, state.daily_reversed and c.rev_kw or c.up_kw, "medium")
+    centered(gg, 555, c.name, "large")
+    local kw_y = 605
+    if state.daily_reversed then
+        centered(gg, 590, "REVERSED", "small")
+        kw_y = 625
+    end
+    centered(gg, kw_y, state.daily_reversed and c.rev_kw or c.up_kw, "medium")
+    gg:line(155, 665, 325, 665, { width = 1 })
     centered(gg, 742, "Tap anywhere to leave altar mode", "small")
 end
 
@@ -385,16 +427,27 @@ local MENU_ITEMS = {
     { "Desk altar", "altar" },
 }
 
+local function menu_row(gg, y, label)
+    local x, w, h = 45, 390, 58
+    gg:text(x + 14, y + 17, label, { font = font("medium") })
+    local ax, ay = x + w - 18, y + math.floor(h / 2)
+    gg:line(ax - 5, ay - 5, ax, ay, { width = 1 })
+    gg:line(ax, ay, ax - 5, ay + 5, { width = 1 })
+    gg:line(x, y + h - 1, x + w, y + h - 1, { width = 1 })
+end
+
 local function draw_menu(gg)
-    centered(gg, 32, "INKARCANA MENU", "large")
-    centered(gg, 78, "Tarot as a prompt for reflection", "small")
+    centered(gg, 30, "INKARCANA", "large")
+    centered(gg, 76, "A quiet space for reflection", "small")
+    gg:line(45, 111, 435, 111, { width = 1 })
     local y = 125
     for _, item in ipairs(MENU_ITEMS) do
-        button(gg, 45, y, 390, 58, item[1], "medium")
+        menu_row(gg, y, item[1])
         y = y + 75
     end
-    button(gg, 45, y, 390, 58,
-        "Reversed cards: " .. (state.reversals_enabled and "ON" or "OFF"), "medium")
+    gg:text(59, y + 17, "Reversed cards", { font = font("medium") })
+    button(gg, 349, y + 14, 72, 30, state.reversals_enabled and "ON" or "OFF", "small")
+    gg:line(45, y + 57, 435, y + 57, { width = 1 })
     y = y + 75
     button(gg, 140, y, 200, 52, "CLOSE", "medium")
 end
@@ -477,7 +530,7 @@ local function handle_tap(x, y)
         refresh()
         return
     end
-    if x >= 14 and x <= 70 and y >= 14 and y <= 54 and state.mode ~= "altar" then
+    if x >= HEADER_MENU_X and x <= HEADER_MENU_X + HEADER_MENU_W and y >= HEADER_MENU_Y and y <= HEADER_MENU_Y + HEADER_MENU_H and state.mode ~= "altar" then
         state.menu_open = true
         refresh()
         return
@@ -531,7 +584,7 @@ local function handle_tap(x, y)
         elseif y >= 718 and y <= 766 and x >= 168 and x <= 312 then
             state.study_index = random_int(#cards)
             state.study_revealed = false
-        elseif x >= CARD_X and x <= CARD_X + CARD_W and y >= 92 and y <= 92 + CARD_H then
+        elseif x >= CARD_X and x <= CARD_X + CARD_W and y >= 96 and y <= 96 + CARD_H then
             state.study_revealed = not state.study_revealed
         end
         refresh()
