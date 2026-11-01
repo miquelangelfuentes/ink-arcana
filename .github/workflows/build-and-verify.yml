@@ -26,9 +26,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Apply visual polish v1.2
-        run: python tools/polish_v12.py
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -45,13 +42,13 @@ jobs:
       - name: Rebuild and verify package
         run: python verify_container.py
 
-      - name: Commit polished source and package
+      - name: Commit rebuilt package
         if: github.event_name == 'push' && github.actor != 'github-actions[bot]'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.lua manifest.json verify_container.py inkarcana.xtapp
+          git add inkarcana.xtapp
           if ! git diff --cached --quiet; then
-            git commit -m "Polish InkArcana interface for v1.2 [skip ci]"
+            git commit -m "Rebuild InkArcana package [skip ci]"
             git push
           fi
