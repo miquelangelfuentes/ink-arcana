@@ -1,5 +1,5 @@
 -- ==============================================================================
--- POCKET ORACLE for XTEINK X4 Pro (XTOS Licorice 261024)
+-- INKARCANA for XTEINK X4 Pro (XTOS Licorice 261024)
 -- An independent, unofficial community tribute inspired by pocketoracle.org
 --
 -- DISCLAIMER & ATTRIBUTION:
@@ -354,7 +354,7 @@ end
 
 -- MODE 1: DAILY ORACLE
 local function draw_daily_mode(g)
-    draw_top_bar(g, "POCKET ORACLE")
+    draw_top_bar(g, "INKARCANA")
 
     local c = cards[state.daily_index]
     if not c then return end
@@ -510,7 +510,7 @@ local function draw_altar_mode(g)
     -- Clean Top Altar Header
     local date_str = get_formatted_date()
     g:line(40, 35, 440, 35, { width = 1 })
-    draw_centered_text(g, 45, "* POCKET ORACLE ALTAR *", "medium")
+    draw_centered_text(g, 45, "* INKARCANA ALTAR *", "medium")
     draw_centered_text(g, 72, date_str, "small")
     g:line(40, 95, 440, 95, { width = 1 })
 

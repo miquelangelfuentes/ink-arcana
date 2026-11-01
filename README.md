@@ -1,4 +1,4 @@
-# Pocket Oracle (Unofficial E-Ink Companion) for XTEINK X4 Pro
+# InkArcana (E-Ink Tarot Companion for XTEINK X4 Pro)
 
 > [!IMPORTANT]
 > **Disclaimer & Attribution:** This application is an independent, open-source community tribute inspired by the contemplative design and e-paper interface of [Pocket Oracle](https://pocketoracle.org/) (by Hiroic Ventures). It is **in no way officially affiliated with, endorsed by, supported by, or connected to Pocket Oracle, Hiroic Ventures, or its creators**.
@@ -84,10 +84,10 @@ pocket-oracle-xtapp/
 
 1. **Compile `.xtapp`:**
    ```bash
-   py pocket-oracle-xtapp/xtpack.py pocket-oracle-xtapp -o pocket-oracle.xtapp
+   py xtpack.py . -o inkarcana.xtapp
    ```
 2. **Transfer to SD Card:**
-   - Copy `pocket-oracle.xtapp` to the root directory of your microSD card.
+   - Copy `inkarcana.xtapp` to the root directory of your microSD card.
    - Insert into the X4 Pro, open **All Files**, and tap the `.xtapp` file.
    - Access anytime via the **Ink App drawer** (unlocked by tapping **"Model" 10 times** in **Settings $\rightarrow$ About**).
 

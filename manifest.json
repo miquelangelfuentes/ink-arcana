@@ -1,9 +1,9 @@
 {
-  "app_id": "pocketoracle",
-  "display_name": "Pocket Oracle",
+  "app_id": "inkarcana",
+  "display_name": "InkArcana",
   "version": "1.0.0",
   "author": "Community (Unofficial Tribute)",
-  "description": "Unofficial contemplative e-paper oracle inspired by pocketoracle.org (not affiliated). Features all 78 1909 RWS cards dithered for e-paper.",
+  "description": "InkArcana: A contemplative e-paper tarot companion for XTEINK X4 Pro (XTOS Licorice). Unofficial community tribute inspired by pocketoracle.org.",
   "entry": "index.lua",
   "api": "2.0",
   "permissions": []
