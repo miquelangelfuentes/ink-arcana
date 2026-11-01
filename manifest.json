@@ -1,9 +1,9 @@
 {
   "app_id": "inkarcana",
   "display_name": "InkArcana",
-  "version": "1.0.0",
-  "author": "Community (Unofficial Tribute)",
-  "description": "InkArcana: A contemplative e-paper tarot companion for XTEINK X4 Pro (XTOS Licorice). Unofficial community tribute inspired by pocketoracle.org.",
+  "version": "1.0",
+  "author": "Community",
+  "description": "InkArcana: A contemplative e-paper tarot companion.",
   "entry": "index.lua",
   "api": "2.0",
   "permissions": []

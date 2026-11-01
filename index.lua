@@ -126,14 +126,13 @@ end
 -- Image Loader & Caching (Atkinson 1-bit PNGs from art_l1.txt / art_l2.txt)
 -- ------------------------------------------------------------------------------
 local PER_FILE = 39
-local strides = {}
 
 local function read_art_line(num)
     local file_idx = math.floor((num - 1) / PER_FILE) + 1
     local file = "art_l" .. file_idx .. ".txt"
     local line_idx = ((num - 1) % PER_FILE) + 1
 
-    local P = ctx.package
+    local P = ctx.data or ctx.package
     if not P then return nil end
 
     local ok, r = pcall(function() return P:open_text(file, { max_line_bytes = 65536 }) end)
@@ -141,17 +140,11 @@ local function read_art_line(num)
 
     local line = nil
     pcall(function()
-        if not strides[file] then
-            local first = r:read_line()
-            if not first then return end
-            strides[file] = #first + 1
-            if line_idx == 1 then
-                line = first
-                return
-            end
+        for i = 1, line_idx do
+            local l = r:read_line()
+            if not l then break end
+            line = l
         end
-        r:seek((line_idx - 1) * strides[file])
-        line = r:read_line()
     end)
     pcall(function() r:close() end)
     return line and line:gsub("%s+$", "")
