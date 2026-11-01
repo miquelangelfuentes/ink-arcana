@@ -1,0 +1,28 @@
+name: Publish InkArcana v1.2.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-v1.2.1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.2.1 >/dev/null 2>&1; then
+            gh release upload v1.2.1 inkarcana.xtapp --clobber
+          else
+            gh release create v1.2.1 inkarcana.xtapp \
+              --target main \
+              --title "InkArcana v1.2.1" \
+              --notes "Refines the v1.2 visual update with a cleaner long-title header layout and a new rounded-square app icon based on the current InkArcana card-back design. The Licorice API 2.9 regression suite and package verification pass on this build."
+          fi
