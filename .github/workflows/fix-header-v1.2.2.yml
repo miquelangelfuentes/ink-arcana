@@ -1,0 +1,91 @@
+name: Fix spread header overlap and publish v1.2.2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fix-header-v1.2.2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Apply robust two-line spread header
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = Path('index.lua')
+          s = p.read_text(encoding='utf-8')
+          old = '''local function title_bar(gg, title)\n    button(gg, HEADER_MENU_X, HEADER_MENU_Y, HEADER_MENU_W, HEADER_MENU_H, "MENU", "small")\n    local left = HEADER_MENU_X + HEADER_MENU_W + 12\n    local right = W - 14\n    local title_font = "medium"\n    local tw = text_width(font(title_font), title)\n    if tw > right - left then\n        title_font = "small"\n        tw = text_width(font(title_font), title)\n    end\n    local tx = left + math.max(0, math.floor(((right - left) - tw) / 2))\n    gg:text(tx, 22, title, { font = font(title_font) })\n    gg:line(14, HEADER_RULE_Y, W - 14, HEADER_RULE_Y, { width = 1 })\nend\n'''
+          new = '''local function title_bar(gg, title)\n    button(gg, HEADER_MENU_X, HEADER_MENU_Y, HEADER_MENU_W, HEADER_MENU_H, "MENU", "small")\n    local left = HEADER_MENU_X + HEADER_MENU_W + 12\n    local right = W - 14\n    local available = right - left\n\n    local function region_text(y, text, fname)\n        local f = font(fname)\n        local tw = text_width(f, text)\n        local tx = left + math.max(0, math.floor((available - tw) / 2))\n        gg:text(tx, y, text, { font = f })\n    end\n\n    -- Spread headings are deliberately split instead of relying on font metrics.\n    -- This keeps them clear of MENU on the physical X4 Pro display.\n    if title:find("CARD REFLECTION", 1, true) then\n        local first = title:gsub(" REFLECTION$", "")\n        region_text(11, first, "small")\n        region_text(35, "REFLECTION", "small")\n    else\n        local title_font = "medium"\n        if text_width(font(title_font), title) > available then\n            title_font = "small"\n        end\n        region_text(22, title, title_font)\n    end\n\n    gg:line(14, HEADER_RULE_Y, W - 14, HEADER_RULE_Y, { width = 1 })\nend\n'''
+          if old not in s:
+              raise SystemExit('Expected title_bar block not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+
+          manifest = Path('manifest.json')
+          data = json.loads(manifest.read_text(encoding='utf-8'))
+          data['version'] = '1.2.2'
+          manifest.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+
+          verify = Path('verify_container.py')
+          v = verify.read_text(encoding='utf-8').replace('manifest["version"] == "1.2.1"', 'manifest["version"] == "1.2.2"')
+          verify.write_text(v, encoding='utf-8')
+
+          tests = Path('test_suite.py')
+          t = tests.read_text(encoding='utf-8')
+          marker = 'assert ":release()" in SOURCE, "decoded images need an explicit release path"\n'
+          addition = marker + 'assert \'title:find("CARD REFLECTION", 1, true)\' in SOURCE, "spread headers must use the overlap-safe two-line layout"\n'
+          if 'spread headers must use the overlap-safe two-line layout' not in t:
+              if marker not in t:
+                  raise SystemExit('Expected test marker not found')
+              t = t.replace(marker, addition, 1)
+          tests.write_text(t, encoding='utf-8')
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run regression tests
+        run: python test_suite.py
+
+      - name: Rebuild and verify package
+        run: python verify_container.py
+
+      - name: Commit corrected source and package
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.lua manifest.json verify_container.py test_suite.py inkarcana.xtapp
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Fix spread header overlap for v1.2.2 [skip ci]"
+            git push
+          fi
+
+      - name: Publish v1.2.2 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.2.2 >/dev/null 2>&1; then
+            gh release upload v1.2.2 inkarcana.xtapp --clobber
+          else
+            gh release create v1.2.2 inkarcana.xtapp \
+              --target "$(git rev-parse HEAD)" \
+              --title "InkArcana v1.2.2" \
+              --notes "Fixes the Three-card reflection and Two-card reflection header overlap on the physical XTEINK X4 Pro. Spread headings now use a dedicated two-line layout beside the MENU control, avoiding reliance on device font-width estimates. The Licorice API 2.9 regression suite and package verification pass on this build."
+          fi
