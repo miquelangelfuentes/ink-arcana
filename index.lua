@@ -78,48 +78,61 @@ end
 -- Card Database & Data Section Loader
 -- ------------------------------------------------------------------------------
 local function load_cards()
-    local P = ctx.package
-    if not P then return end
+    local P = ctx.data or ctx.package
+    if P then
+        local ok, r = pcall(function() return P:open_text("cards.txt", { max_line_bytes = 2048 }) end)
+        if ok and r and type(r) ~= "string" then
+            while true do
+                local okl, l = pcall(function() return r:read_line() end)
+                if not okl or not l then break end
 
-    local ok, r = pcall(function() return P:open_text("cards.txt", { max_line_bytes = 2048 }) end)
-    if not ok or not r or type(r) == "string" then return end
+                local key, name, up_kw, up_read, rev_kw, rev_read = l:match("^([%w_]+)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)")
+                if key and name then
+                    -- Single clean keywords
+                    local clean_up_kw = up_kw:match("^([^,]+)") or up_kw
+                    clean_up_kw = clean_up_kw:gsub("^%s+", ""):gsub("%s+$", "")
+                    clean_up_kw = clean_up_kw:sub(1,1):upper() .. clean_up_kw:sub(2)
 
-    while true do
-        local okl, l = pcall(function() return r:read_line() end)
-        if not okl or not l then break end
+                    local clean_rev_kw = rev_kw:match("^([^,]+)") or rev_kw
+                    clean_rev_kw = clean_rev_kw:gsub("^%s+", ""):gsub("%s+$", "")
+                    clean_rev_kw = clean_rev_kw:sub(1,1):upper() .. clean_rev_kw:sub(2)
 
-        local key, name, up_kw, up_read, rev_kw, rev_read = l:match("^([%w_]+)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)")
-        if key and name then
-            -- Single clean keywords
-            local clean_up_kw = up_kw:match("^([^,]+)") or up_kw
-            clean_up_kw = clean_up_kw:gsub("^%s+", ""):gsub("%s+$", "")
-            clean_up_kw = clean_up_kw:sub(1,1):upper() .. clean_up_kw:sub(2)
+                    -- Determine suit
+                    local s_prefix = key:sub(1,1)
+                    local suit = "major"
+                    if s_prefix == "w" then suit = "wands"
+                    elseif s_prefix == "c" then suit = "cups"
+                    elseif s_prefix == "s" then suit = "swords"
+                    elseif s_prefix == "p" then suit = "pentacles"
+                    end
 
-            local clean_rev_kw = rev_kw:match("^([^,]+)") or rev_kw
-            clean_rev_kw = clean_rev_kw:gsub("^%s+", ""):gsub("%s+$", "")
-            clean_rev_kw = clean_rev_kw:sub(1,1):upper() .. clean_rev_kw:sub(2)
-
-            -- Determine suit
-            local s_prefix = key:sub(1,1)
-            local suit = "major"
-            if s_prefix == "w" then suit = "wands"
-            elseif s_prefix == "c" then suit = "cups"
-            elseif s_prefix == "s" then suit = "swords"
-            elseif s_prefix == "p" then suit = "pentacles"
+                    table.insert(cards, {
+                        key = key,
+                        name = name,
+                        up_kw = clean_up_kw,
+                        up_read = up_read,
+                        rev_kw = clean_rev_kw,
+                        rev_read = rev_read,
+                        suit = suit
+                    })
+                end
             end
-
-            table.insert(cards, {
-                key = key,
-                name = name,
-                up_kw = clean_up_kw,
-                up_read = up_read,
-                rev_kw = clean_rev_kw,
-                rev_read = rev_read,
-                suit = suit
-            })
+            pcall(function() r:close() end)
         end
     end
-    pcall(function() r:close() end)
+
+    -- Safety fallback: ensure cards table is never empty to prevent divide-by-zero
+    if #cards == 0 then
+        table.insert(cards, {
+            key = "c09",
+            name = "Nine of Cups",
+            up_kw = "Contentment",
+            up_read = "The wish granted, and the satisfaction of it. Contentment, comfort, plenty. Enjoy it without mistaking it for everything.",
+            rev_kw = "Smugness",
+            rev_read = "Complacency, indulgence, or satisfaction that curdles into smugness. Look beyond what is already full.",
+            suit = "cups"
+        })
+    end
 end
 
 -- ------------------------------------------------------------------------------
@@ -561,15 +574,15 @@ end
 -- Lifecycle Callbacks
 -- ------------------------------------------------------------------------------
 
-function on_load(ctx)
+function on_load()
     load_cards()
 
     local today_day = get_epoch_day()
     state.last_day = today_day
 
-    -- Deterministic card of the day
+    local num_c = #cards > 0 and #cards or 1
     local s = (today_day * 2654435761) % 2147483648
-    state.daily_index = (s % #cards) + 1
+    state.daily_index = (s % num_c) + 1
     state.daily_reversed = state.reversals_enabled and (((s // 78) % 100) <= 25) or false
 
     -- Initialize spreads
@@ -593,7 +606,17 @@ function on_load(ctx)
     end
 end
 
-function on_draw(ctx, g)
+function on_enter()
+    if ctx and ctx.invalidate then
+        pcall(function() ctx.invalidate() end)
+    end
+end
+
+function on_draw(a, b)
+    local draw_g = (b and type(b) == "table" and b.rect) and b or ((a and type(a) == "table" and a.rect) and a or g)
+    local g = draw_g
+    if not g then return end
+
     g:rect(0, 0, W, H, { fill = 1 })
 
     if state.mode == "daily" then
@@ -611,7 +634,8 @@ function on_draw(ctx, g)
     end
 end
 
-function on_input(ctx, event)
+function on_input(a, b)
+    local event = (b and type(b) == "table" and (b.x or b.type)) and b or a
     if not event then return end
 
     local x, y = event.x, event.y
@@ -769,7 +793,7 @@ function on_input(ctx, event)
     end
 end
 
-function on_leave(ctx)
+function on_leave()
     if ctx then
         ctx.state = {
             last_day = state.last_day,
@@ -779,5 +803,13 @@ function on_leave(ctx)
             has_turned_today = state.has_turned_today,
             reversals_enabled = state.reversals_enabled
         }
+        if ctx.save then pcall(function() ctx.save() end) end
     end
+end
+
+function on_unload()
+    on_leave()
+end
+
+function on_tick()
 end
