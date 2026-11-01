@@ -1,5 +1,5 @@
 -- InkArcana for XTEINK X4 Pro / XTOS Licorice API 2.x
--- Visual polish v1.2: refined spacing and e-paper-friendly controls.
+-- Study mode v1.3: card-first learning with upright and reversed meanings.
 -- Designed for the API 2.9 host observed on firmware 26102301 / 26102401.
 -- The app is fully offline. Tarot is presented as a reflective prompt, not a prediction.
 
@@ -409,15 +409,31 @@ local function draw_study(gg)
     if #cards == 0 then return end
     local c = cards[state.study_index]
     centered(gg, 72, string.format("%d / %d", state.study_index, #cards), "small")
-    draw_card_art(gg, state.study_index, false, CARD_X, 96, CARD_W, CARD_H)
-    if state.study_revealed then
-        centered(gg, 530, c.name, "large")
+
+    if not state.study_revealed then
+        draw_card_art(gg, state.study_index, false, CARD_X, 96, CARD_W, CARD_H)
+        local card_font = text_width(font("large"), c.name) > 420 and "medium" or "large"
+        centered(gg, 530, c.name, card_font)
         centered(gg, 575, c.up_kw, "medium")
-        paragraph(gg, 615, c.up_read, "small", 390, 700)
+        gg:line(145, 620, 335, 620, { width = 1 })
+        centered(gg, 650, "Tap for meaning", "small")
     else
-        centered(gg, 535, "MYSTERY CARD", "large")
-        centered(gg, 585, "Tap the card to reveal it", "medium")
+        local card_font = text_width(font("large"), c.name) > 420 and "medium" or "large"
+        centered(gg, 104, c.name, card_font)
+
+        centered(gg, 150, "UPRIGHT", "small")
+        centered(gg, 178, c.up_kw, "medium")
+        gg:line(100, 214, 380, 214, { width = 1 })
+        paragraph(gg, 235, c.up_read, "small", 390, 365)
+
+        gg:line(100, 390, 380, 390, { width = 1 })
+        centered(gg, 410, "REVERSED", "small")
+        centered(gg, 438, c.rev_kw, "medium")
+        gg:line(100, 475, 380, 475, { width = 1 })
+        paragraph(gg, 495, c.rev_read, "small", 390, 670)
+        centered(gg, 684, "Tap to return to card", "small")
     end
+
     button(gg, 24, 718, 118, 48, "PREV", "small")
     button(gg, 168, 718, 144, 48, "RANDOM", "small")
     button(gg, 338, 718, 118, 48, "NEXT", "small")
@@ -527,7 +543,7 @@ local function handle_menu_tap(x, y)
             elseif id == "triad" or id == "cross" then
                 begin_spread(id)
             elseif id == "study" then
-                state.mode = "study"; state.menu_open = false
+                state.mode = "study"; state.study_revealed = false; state.menu_open = false
             elseif id == "altar" then
                 state.mode = "altar"; state.menu_open = false
             end
@@ -606,8 +622,10 @@ local function handle_tap(x, y)
         elseif y >= 718 and y <= 766 and x >= 168 and x <= 312 then
             state.study_index = random_int(#cards)
             state.study_revealed = false
+        elseif state.study_revealed then
+            state.study_revealed = false
         elseif x >= CARD_X and x <= CARD_X + CARD_W and y >= 96 and y <= 96 + CARD_H then
-            state.study_revealed = not state.study_revealed
+            state.study_revealed = true
         end
         refresh()
     end

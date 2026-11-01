@@ -37,7 +37,7 @@ Cards in a spread are selected without duplicates. Reversed cards can be enabled
 
 ### Study mode
 
-Study mode shows one card at a time. You can hide its identity before revealing it, move through the deck with the screen controls or use the physical side buttons. A random-card control is also available.
+Study mode shows each card with its name and upright theme from the start. Tap the card to open a learning view with the upright interpretation and the reversed meaning. Use the on-screen controls or physical side buttons to move through the deck; a random-card control is also available.
 
 ### Desk altar
 
