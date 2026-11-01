@@ -1,5 +1,5 @@
 -- InkArcana for XTEINK X4 Pro / XTOS Licorice API 2.x
--- Study mode v1.3: card-first learning with upright and reversed meanings.
+-- Study mode v1.4: complete meanings with an upright/reversed orientation toggle.
 -- Designed for the API 2.9 host observed on firmware 26102301 / 26102401.
 -- The app is fully offline. Tarot is presented as a reflective prompt, not a prediction.
 
@@ -31,6 +31,7 @@ local state = {
     spread_view = "front",
     study_index = 1,
     study_revealed = false,
+    study_reversed = false,
     menu_open = false,
 }
 
@@ -50,6 +51,7 @@ local function save_state()
         has_turned_today = state.has_turned_today,
         reversals_enabled = state.reversals_enabled,
         study_index = state.study_index,
+        study_reversed = state.study_reversed,
     }
     pcall(function() ctx:save_state() end)
 end
@@ -410,28 +412,28 @@ local function draw_study(gg)
     local c = cards[state.study_index]
     centered(gg, 72, string.format("%d / %d", state.study_index, #cards), "small")
 
+    local orientation = state.study_reversed and "REVERSED" or "UPRIGHT"
+    local keywords = state.study_reversed and c.rev_kw or c.up_kw
+    local meaning = state.study_reversed and c.rev_read or c.up_read
+    local toggle_label = state.study_reversed and "SHOW UPRIGHT" or "SHOW REVERSED"
+
     if not state.study_revealed then
-        draw_card_art(gg, state.study_index, false, CARD_X, 96, CARD_W, CARD_H)
+        draw_card_art(gg, state.study_index, state.study_reversed, CARD_X, 96, CARD_W, CARD_H)
         local card_font = text_width(font("large"), c.name) > 420 and "medium" or "large"
         centered(gg, 530, c.name, card_font)
-        centered(gg, 575, c.up_kw, "medium")
-        gg:line(145, 620, 335, 620, { width = 1 })
-        centered(gg, 650, "Tap for meaning", "small")
+        centered(gg, 575, keywords, "medium")
+        centered(gg, 610, orientation, "small")
+        button(gg, 150, 638, 180, 44, toggle_label, "small")
+        centered(gg, 690, "Tap the card for meaning", "small")
     else
         local card_font = text_width(font("large"), c.name) > 420 and "medium" or "large"
-        centered(gg, 104, c.name, card_font)
-
-        centered(gg, 150, "UPRIGHT", "small")
-        centered(gg, 178, c.up_kw, "medium")
-        gg:line(100, 214, 380, 214, { width = 1 })
-        paragraph(gg, 235, c.up_read, "small", 390, 365)
-
-        gg:line(100, 390, 380, 390, { width = 1 })
-        centered(gg, 410, "REVERSED", "small")
-        centered(gg, 438, c.rev_kw, "medium")
-        gg:line(100, 475, 380, 475, { width = 1 })
-        paragraph(gg, 495, c.rev_read, "small", 390, 670)
-        centered(gg, 684, "Tap to return to card", "small")
+        centered(gg, 102, c.name, card_font)
+        centered(gg, 148, orientation, "small")
+        centered(gg, 178, keywords, "medium")
+        gg:line(90, 216, 390, 216, { width = 1 })
+        paragraph(gg, 242, meaning, "small", 410, 610)
+        button(gg, 150, 638, 180, 44, toggle_label, "small")
+        centered(gg, 690, "Tap elsewhere to return to card", "small")
     end
 
     button(gg, 24, 718, 118, 48, "PREV", "small")
@@ -622,9 +624,12 @@ local function handle_tap(x, y)
         elseif y >= 718 and y <= 766 and x >= 168 and x <= 312 then
             state.study_index = random_int(#cards)
             state.study_revealed = false
+        elseif x >= 150 and x <= 330 and y >= 638 and y <= 682 then
+            state.study_reversed = not state.study_reversed
+            save_state()
         elseif state.study_revealed then
             state.study_revealed = false
-        elseif x >= CARD_X and x <= CARD_X + CARD_W and y >= 96 and y <= 96 + CARD_H then
+        elseif y >= 90 and y <= 620 then
             state.study_revealed = true
         end
         refresh()
@@ -698,6 +703,9 @@ function on_load(c)
         if type(saved) == "table" then
             if saved.study_index and #cards > 0 then
                 state.study_index = math.max(1, math.min(#cards, tonumber(saved.study_index) or 1))
+            end
+            if saved.study_reversed ~= nil then
+                state.study_reversed = saved.study_reversed == true
             end
             if saved.daily_day == today then
                 if saved.daily_index and #cards > 0 then

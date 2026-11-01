@@ -18,8 +18,10 @@ assert "ctx:save_state()" in SOURCE, "state persistence must use save_state"
 assert ":release()" in SOURCE, "decoded images need an explicit release path"
 assert 'title:find("CARD REFLECTION", 1, true)' in SOURCE, "spread headers must use the overlap-safe two-line layout"
 assert '"MYSTERY CARD"' not in SOURCE, "Study mode must identify cards immediately"
-assert '"Tap for meaning"' in SOURCE, "Study mode must offer the learning view"
-assert 'centered(gg, 150, "UPRIGHT", "small")' in SOURCE and 'centered(gg, 410, "REVERSED", "small")' in SOURCE, "Study learning view must cover both orientations"
+assert '"Tap the card for meaning"' in SOURCE, "Study mode must offer the learning view"
+assert 'study_reversed = false' in SOURCE, "Study mode needs an orientation state"
+assert '"SHOW REVERSED"' in SOURCE and '"SHOW UPRIGHT"' in SOURCE, "Study mode needs an upright/reversed toggle"
+assert 'paragraph(gg, 242, meaning, "small", 410, 610)' in SOURCE, "Study meaning needs the full reading area"
 
 assert len(CARDS) == 78, f"expected 78 cards, got {len(CARDS)}"
 keys = set()
@@ -169,15 +171,20 @@ on_input(ctx, { type = "key", key = "right", phase = "down", time_ms = 2100 })
 assert(after_one ~= before)
 assert(S.spread_pos == after_one, "duplicate key event was not debounced")
 
--- Study mode identifies the card immediately; tapping opens and closes the learning view.
+-- Study mode identifies the card, exposes both orientations, and keeps one full meaning on screen.
 S.mode = "study"
 S.study_revealed = false
+S.study_reversed = false
 local study_index = S.study_index
 on_input(ctx, { type = "pointer", phase = "up", gesture = "tap", x = 240, y = 300, time_ms = 2400 })
 assert(S.study_revealed == true, "Study card tap did not open the learning view")
 assert(S.study_index == study_index, "Study card tap changed the selected card")
-on_input(ctx, { type = "pointer", phase = "up", gesture = "tap", x = 240, y = 300, time_ms = 2600 })
+on_input(ctx, { type = "pointer", phase = "up", gesture = "tap", x = 240, y = 655, time_ms = 2600 })
+assert(S.study_reversed == true, "Study orientation toggle did not select reversed")
+assert(S.study_revealed == true, "Changing Study orientation closed the learning view")
+on_input(ctx, { type = "pointer", phase = "up", gesture = "tap", x = 240, y = 300, time_ms = 2800 })
 assert(S.study_revealed == false, "Study learning view did not return to the card")
+assert(S.study_reversed == true, "Study orientation was not preserved when returning to the card")
 
 for _, mode in ipairs({ "daily", "spread", "study", "altar" }) do
     S.mode = mode

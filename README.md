@@ -37,7 +37,7 @@ Cards in a spread are selected without duplicates. Reversed cards can be enabled
 
 ### Study mode
 
-Study mode shows each card with its name and upright theme from the start. Tap the card to open a learning view with the upright interpretation and the reversed meaning. Use the on-screen controls or physical side buttons to move through the deck; a random-card control is also available.
+Study mode shows each card with its name and the currently selected orientation. Use the upright/reversed toggle to rotate the card and switch its keywords. Tap the card to open the full interpretation for that orientation; this gives the meaning enough space to display without being cut short. The deck navigation controls remain available below.
 
 ### Desk altar
 
