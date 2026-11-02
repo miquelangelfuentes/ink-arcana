@@ -2,7 +2,7 @@
 ### A reflective 1909 Rider-Waite-Smith tarot companion for XTEINK X4 Pro
 
 > [!IMPORTANT]
-> **InkArcana** is an independent open-source project inspired by the contemplative e-paper approach of [Pocket Oracle](https://pocketoracle.org/) by Hiroic Ventures. It is not affiliated with Pocket Oracle or Hiroic Ventures.
+> **InkArcana** is an independent open-source project for the XTEINK X4 Pro.
 >
 > The 78 illustrations come from the original 1909 Rider-Waite-Smith deck drawn by **Pamela Colman Smith** under the direction of Arthur Edward Waite. The artwork is in the public domain.
 
@@ -121,7 +121,7 @@ For implementation details and the limits of automated testing, see [APP_CONSTRU
 
 ## Credits and licence
 
-- **Inspiration:** [Pocket Oracle](https://pocketoracle.org/) by Hiroic Ventures.
+- **Inspiration:** [Pocket Oracle](https://pocketoracle.org/) by Hiroic Ventures. InkArcana is an independent project and is not affiliated with Pocket Oracle or Hiroic Ventures.
 - **Artwork:** Pamela Colman Smith's 1909 Rider-Waite-Smith illustrations, public domain.
 - **Firmware research:** XTEINK community reverse engineering, including `kycube/x4pro-emu` and `omer-faruq-xteink/touch-licorice-apps`.
 - **Licence:** MIT.
