@@ -1,4 +1,4 @@
-# InkArcana 🎴
+# InkArcana 
 ### A reflective 1909 Rider-Waite-Smith tarot companion for XTEINK X4 Pro
 
 > [!IMPORTANT]
